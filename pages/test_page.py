@@ -202,11 +202,19 @@ class TestPage(QWidget):
         main_layout.addLayout(content_layout)
 
         self.energy_beam = EnergyBeamWidget(self)
-        self.energy_beam.raise_()
+        self.energy_beam.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.energy_beam.lower()
 
         self.color_timer = QTimer(self)
         self.color_timer.timeout.connect(self._update_hue)
         self.color_timer.start(50)
+
+        QTimer.singleShot(100, self._raise_interactive_widgets)
+
+    def _raise_interactive_widgets(self):
+        self.option_a.raise_()
+        self.option_b.raise_()
+        self.back_btn.raise_()
 
     def _update_background_color(self):
         palette = self.palette()
@@ -294,9 +302,15 @@ class TestPage(QWidget):
         compass_center_y = self.compass.geometry().center().y()
 
         self.energy_beam.setEndpoints(x1, y1, compass_center_x, compass_center_y)
+        self.energy_beam.raise_()
         self.energy_beam.show()
 
-        QTimer.singleShot(500, lambda: self.energy_beam.hide())
+        QTimer.singleShot(500, self._on_beam_finished)
+
+    def _on_beam_finished(self):
+        self.energy_beam.hide()
+        self.energy_beam.lower()
+        self._raise_interactive_widgets()
 
     def _next_question(self):
         self.current_index += 1
@@ -311,6 +325,9 @@ class TestPage(QWidget):
         super().resizeEvent(event)
         self.particles.setGeometry(0, 0, self.width(), self.height())
         self.energy_beam.setGeometry(0, 0, self.width(), self.height())
+        self.particles.lower()
+        self.energy_beam.lower()
+        self._raise_interactive_widgets()
 
     def reset(self):
         self.current_index = 0

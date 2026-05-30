@@ -296,6 +296,7 @@ class EnergyBeamWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._tick)
         self._timer.start(30)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def setEndpoints(self, x1, y1, x2, y2):
         self._x1 = x1
